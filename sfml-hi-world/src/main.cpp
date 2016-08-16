@@ -1,6 +1,8 @@
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
+
+#include <Box2D/Box2D.h>
+#include <SFML/Graphics.hpp>
 
 #include "cmake_options.hpp"
 
@@ -25,8 +27,44 @@ sf::Font loadFont(std::string name) {
 }
 
 int main() {
+    // Set up Box2D world
+    b2Vec2 gravity(0.0f, -10.0f);
+    b2World world {gravity};
+
+    // Settings
+    float32 timeStep = 1.0f / 60.0f;
+    int32 velocityIterations = 8;
+    int32 positionIterations = 3;
+
     sf::RenderWindow window(sf::VideoMode(800, 600), "Hi, world");
     window.setFramerateLimit(60);
+
+    // Create a "ground"
+    b2BodyDef bodyGroundDef;
+    bodyGroundDef.type = b2_dynamicBody;
+    bodyGroundDef.position.Set(0.0f, -10.0f);
+    b2Body *bodyGround = world.CreateBody(&bodyGroundDef);
+
+    b2PolygonShape boxGround;
+    boxGround.SetAsBox(50.0f, 10.0f);
+
+    bodyGround->CreateFixture(&boxGround, 0.0f);
+
+    // Create a ball tile
+    b2BodyDef bodyBallDef;
+    bodyBallDef.type = b2_dynamicBody;
+    bodyBallDef.position.Set(50.0f, 50.0f);
+    b2Body *bodyBall = world.CreateBody(&bodyBallDef);
+
+    b2PolygonShape dynamicBoxBall;
+    dynamicBoxBall.SetAsBox(1.0f, 1.0f);
+
+    b2FixtureDef fixtureDefBall;
+    fixtureDefBall.shape = &dynamicBoxBall;
+    fixtureDefBall.density = 1.0f;
+    fixtureDefBall.friction = 0.1f;
+
+    bodyBall->CreateFixture(&fixtureDefBall);
 
     sf::Sprite ballSprite = loadSprite("ball.png");
     ballSprite.setColor(sf::Color(255, 255, 255));
@@ -59,7 +97,14 @@ int main() {
                     break;
             }
         }
-        ballSprite.rotate(2.0f);
+        // Update the world
+        world.Step(timeStep, velocityIterations, positionIterations);
+        b2Vec2 ballPosition = bodyBall->GetPosition();
+        float32 ballAngle = bodyBall->GetAngle();
+
+        // Update the tiles
+        ballSprite.setPosition(ballPosition.x, ballPosition.y + 100);
+
         window.clear(sf::Color::White);
         window.draw(ballSprite);
         window.draw(text);
