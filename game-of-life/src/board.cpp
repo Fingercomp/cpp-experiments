@@ -1,28 +1,91 @@
 #include <vector>
 
-class Board {
-public:
-    int getWidth() const {
-        return m_w;
-    }
+#include "board.hpp"
 
-    int getHeight() const {
-        return m_h;
-    }
 
-    std::vector<bool> newGeneration() {
-        // TODO: implement
-        return std::vector<bool>;
-    }
+Board::Board(const int w, const int h): _w(w), _h(h) {
+    assert(w > 1);
+    assert(h > 1);
 
-    const std::vector<bool>& getCells() const {
-        return cells;
+    // Fill the board
+    _cells.reserve(w * h);
+    _nextGen.reserve(w * h);
+    for (int j = 0; j < h; ++j) {
+        for (int i = 0; i < w; ++i) {
+            _cells[j * w + i] = false;
+            _nextGen[j * w + 1] = false;
+        }
     }
+}
 
-    bool operator()(const int x, const int y) {
-        assert(x >= 0 && x < m_w);
-        assert(y >= 0 && x < m_h);
-
-        return cells[y * m_h + x];
+std::vector<bool> Board::newGeneration() {
+    std::vector<bool> newGen;
+    for (int y = 0; y < _h; ++y) {
+        for (int x = 0; x < _w; ++x) {
+            bool cell = _cells[y * _w + x];
+            int nb = getNeighborCount(x, y);
+            newGen[y * _w + x] = (cell && nb == 2) || nb == 3;
+        }
     }
-};
+    return newGen;
+}
+
+int Board::getWidth() const {
+    return _w;
+}
+
+int Board::getHeight() const {
+    return _h;
+}
+
+const std::vector<bool>& Board::getCells() const {
+    return _cells;
+}
+
+const std::vector<bool>& Board::getNextGeneration() const {
+    return _nextGen;
+}
+
+int Board::getNeighborCount(const int x, const int y) const {
+    int neighbors = 0;
+    for (int i = x - 1; i <= x + 1; ++i) {
+        // "glue" the edges of a board
+        if (i < 0) {
+            i = _w + i;
+        } else if (i >= _w) {
+            i = i % _w;
+        }
+        for (int j = y - 1; j <= y + 1; ++j) {
+            if (j < 0) {
+                j = _h + j;
+            } else if (j >= _h) {
+                j = j % _h;
+            }
+            if (_cells[j * _w + i]) {
+                ++i;
+            }
+        }
+    }
+    return neighbors;
+}
+
+std::vector<bool> Board::step() {
+    std::vector<bool> oldGen(_cells);
+    _cells = _nextGen;
+    _nextGen = newGeneration();
+    return oldGen;
+}
+
+void Board::set(const int x, const int y, const bool value) {
+    assert(x >= 0 && x < _w);
+    assert(y >= 0 && y < _h);
+    _cells[y * _w + x] = value;
+    _nextGen = newGeneration();  // Update the highlighting
+}
+
+bool Board::get(const int x, const int y) const {
+    assert(x >= 0 && x < _w);
+    assert(y >= 0 && y < _h);
+
+    return _cells[y * _w + x];
+}

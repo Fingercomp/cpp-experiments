@@ -4,6 +4,7 @@
 */Makefile
 */cmake_install.cmake
 */compile_commands.json
+*/generated/
 
 # Executables
 */bin/*

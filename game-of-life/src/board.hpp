@@ -1,22 +1,30 @@
 #pragma once
 
+#include <cassert>
 #include <vector>
+
 
 class Board {
 private:
-    int m_w;  // the width of board
-    int m_h;  // the height of board
+    int _w;  // the width of board
+    int _h;  // the height of board
 
-    //  0  1  2  3  4
-    //  5  6  7  8  9
-    // 10 11 12 13 14
-    // 15 16 17 18 19
-    std::vector<bool> cells;  // the vector of cells
+    //  i  i  i  i  i
+    //  0  1  2  3  4 j
+    //  5  6  7  8  9 j
+    // 10 [11] = {i=1, j=2}
+    // 15 16 17 18 19 j
+    std::vector<bool> _cells;  // the vector of cells
+    std::vector<bool> _nextGen;  // for highlighting
+    std::vector<bool> newGeneration();
 public:
-    Board(const int w, const int h): m_w(w), m_h(h) {}
+    Board(const int w, const int h);
     int getWidth() const;
     int getHeight() const;
-    std::vector<bool> newGeneration();
+    std::vector<bool> step();
     const std::vector<bool>& getCells() const;
-    bool operator()(const int x, const int y);
+    const std::vector<bool>& getNextGeneration() const;
+    int getNeighborCount(const int x, const int y) const;
+    void set(const int x, const int y, const bool value);
+    bool get(const int x, const int y) const;
 };

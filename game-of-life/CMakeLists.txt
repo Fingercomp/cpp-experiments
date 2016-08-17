@@ -1,15 +1,21 @@
 cmake_minimum_required(VERSION 2.6)
-project(SFMLHiWorld)
+project(GameOfLife)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(EXECUTABLE_NAME "game-of-life")
-add_executable(${EXECUTABLE_NAME} src/main.cpp)
+
+file(GLOB SRC_FILES
+    "src/*.h"
+    "src/*.cpp"
+)
+
+add_executable(${EXECUTABLE_NAME} ${SRC_FILES})
 
 set(RESOURCES_DIR "resources" CACHE STRING "Where to find resources")
 
-configure_file(src/cmake_options.hpp.in ${CMAKE_BINARY_DIR}/generated/cmake_options.hpp)
+configure_file(src/cmake-options.hpp.in ${CMAKE_BINARY_DIR}/generated/cmake-options.hpp)
 include_directories("${CMAKE_BINARY_DIR}/generated")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_SOURCE_PATH})
