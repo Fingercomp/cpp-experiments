@@ -8,6 +8,7 @@
 
 #include "board.hpp"
 #include "graphics.hpp"
+#include "main.hpp"
 
 
 int main() {
@@ -19,10 +20,14 @@ int main() {
     createTileset(graphicsSettings::colors, tilesetNumbers, tilesetBytes, texture);
     Tilemap tilemap(cellTilemap, texture, tilesetNumbers);
     sf::RenderWindow window(sf::VideoMode(800, 600), "Game of Life");
-    window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(30);  // no need for high FPS
 
     sf::Vector2u windowSize = window.getSize();
     cellTilemap.resize(ceil(static_cast<float>(windowSize.x) / graphicsSettings::cellWidth), ceil(static_cast<float>(windowSize.y) / graphicsSettings::cellHeight));
+
+    State state = State::PAUSED;
+    sf::Time updateInterval = sf::milliseconds(1000 / 5);  // in milliseconds
+    sf::Clock clock;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -37,22 +42,63 @@ int main() {
                     cellTilemap.resize(ceil(static_cast<float>(event.size.width) / graphicsSettings::cellWidth), ceil(static_cast<float>(event.size.height) / graphicsSettings::cellHeight));
                 }
                 case sf::Event::MouseButtonPressed: {
-                    if (event.mouseButton.button == sf::Mouse::Left) {
-                        int x = event.mouseButton.x;
-                        int y = event.mouseButton.y;
-                        x = x / graphicsSettings::cellWidth;
-                        y = y / graphicsSettings::cellHeight;
-                        cellTilemap.set(x, y, true);
+                    switch (event.mouseButton.button) {
+                        case sf::Mouse::Left: {
+                            int x = event.mouseButton.x;
+                            int y = event.mouseButton.y;
+                            x /= graphicsSettings::cellWidth;
+                            y /= graphicsSettings::cellHeight;
+                            cellTilemap.set(x, y, true);
+                            break;
+                        }
+                        case sf::Mouse::Right: {
+                            int x = event.mouseButton.x;
+                            int y = event.mouseButton.y;
+                            x /= graphicsSettings::cellWidth;
+                            y /= graphicsSettings::cellHeight;
+                            cellTilemap.set(x, y, false);
+                            break;
+                        }
+                        case sf::Mouse::Middle: {
+                            int x = event.mouseButton.x;
+                            int y = event.mouseButton.y;
+                            x /= graphicsSettings::cellWidth;
+                            y /= graphicsSettings::cellHeight;
+                            std::cout << "DEBUG INFO FOR {x=" << x << ", y=" << y << "}:\n";
+                            std::cout << "Neighbors: " << board.getNeighborCount(x, y) << "\n";
+                            break;
+                        }
+                        default:
+                            break;
                     }
+                }
+                case sf::Event::KeyPressed: {
+                    switch (event.key.code) {
+                        case sf::Keyboard::Space:
+                            if (state == State::PAUSED) {
+                                state = State::RUNNING;
+                            } else if (state == State::RUNNING) {
+                                state = State::PAUSED;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 }
                 default:
                     break;
             }
         }
+        if (state == State::RUNNING) {
+            if (clock.getElapsedTime() >= updateInterval) {
+                board.step();
+                clock.restart();
+            }
+        }
         window.clear();
         tilemap.update();
         window.draw(tilemap);
-        // window.draw(shape, &texture);
         window.display();
     }
 

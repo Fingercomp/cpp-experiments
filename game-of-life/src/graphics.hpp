@@ -25,9 +25,9 @@ namespace graphicsSettings {
     const int cellHeight = 5;
     const std::map<Tile, sf::Color> colors {
         {Tile::DEAD, sf::Color(0x00, 0x00, 0x00)},
-        {Tile::DEAD_NEXT_GEN, sf::Color(0x80, 0x00, 0x00)},
+        {Tile::DEAD_NEXT_GEN, sf::Color(0xff, 0x40, 0x40)},
         {Tile::ALIVE, sf::Color(0xff, 0xff, 0xff)},
-        {Tile::ALIVE_NEXT_GEN, sf::Color(0x00, 0x80, 0x00)}
+        {Tile::ALIVE_NEXT_GEN, sf::Color(0x00, 0x40, 0x00)}
     };
 }
 

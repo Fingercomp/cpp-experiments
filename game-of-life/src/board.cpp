@@ -60,7 +60,9 @@ int Board::getNeighborCount(const int x, const int y) const {
                 indexJ = j % _h;
             }
             if (_cells[indexJ * _w + indexI]) {
-                ++i;
+                if (i != x || j != y) {
+                    ++neighbors;
+                }
             }
         }
     }
