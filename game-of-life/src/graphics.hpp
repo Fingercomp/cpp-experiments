@@ -66,4 +66,4 @@ sf::Sprite loadSprite(sf::Texture &texture);
 
 sf::Font loadFont(std::string filename);
 
-void createTileset(const std::map<Tile, sf::Color> &colors, std::vector<std::pair<Tile, sf::Color>> &result, std::vector<uint8_t> &colorVec, sf::Texture &texture);
+void createTileset(const std::map<Tile, sf::Color> &colors, std::vector<std::pair<Tile, sf::Color>> &result, sf::Uint8 *pixels, sf::Texture &texture);

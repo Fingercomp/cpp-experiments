@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "graphics.hpp"
 #include "utils.hpp"
 
@@ -24,8 +26,12 @@ void CellTilemap::update() {
     for (int j = 0; j < _h; ++j) {
         for (int i = 0; i < _w; ++i) {
             int index = j * _w + i;
-            bool thisGenCell = thisGen[index];
-            bool nextGenCell = nextGen[index];
+            bool thisGenCell = thisGen.at(index);
+            bool nextGenCell = nextGen.at(index);
+            if (thisGenCell || nextGenCell) {
+                // nop.
+                int aaabbb = 0;
+            }
             if (thisGenCell && nextGenCell) {
                 _tiles.at(index) = Tile::ALIVE;
             } else if (thisGenCell && !nextGenCell) {
@@ -90,10 +96,10 @@ void Tilemap::update() {
             quad[2].position = sf::Vector2f((i + 1) * graphicsSettings::cellWidth, (j + 1) * graphicsSettings::cellHeight);
             quad[3].position = sf::Vector2f(i * graphicsSettings::cellWidth, (j + 1) * graphicsSettings::cellHeight);
 
-            quad[0].texCoords = sf::Vector2f(num, 0);
-            quad[1].texCoords = sf::Vector2f(num, 0);
-            quad[2].texCoords = sf::Vector2f(num, 0);
-            quad[3].texCoords = sf::Vector2f(num, 0);
+            quad[0].texCoords = sf::Vector2f(num * graphicsSettings::cellWidth, 0);
+            quad[1].texCoords = sf::Vector2f((num + 1) * graphicsSettings::cellWidth, 0);
+            quad[2].texCoords = sf::Vector2f((num + 1) * graphicsSettings::cellWidth, graphicsSettings::cellHeight);
+            quad[3].texCoords = sf::Vector2f(num * graphicsSettings::cellWidth, graphicsSettings::cellHeight);
         }
     }
 }
@@ -133,20 +139,24 @@ sf::Font loadFont(std::string filename) {
 }
 
 // Creates a tileset
-void createTileset(const std::map<Tile, sf::Color> &colors, std::vector<std::pair<Tile, sf::Color>> &result, std::vector<uint8_t> &colorVec, sf::Texture &texture) {
+void createTileset(const std::map<Tile, sf::Color> &colors, std::vector<std::pair<Tile, sf::Color>> &result, sf::Uint8 *pixels, sf::Texture &texture) {
+    assert(!pixels);
+    pixels = new sf::Uint8[colors.size() * graphicsSettings::cellHeight * graphicsSettings::cellWidth * 4];
+    int pos = 0;
     for (int i = 0; i < graphicsSettings::cellHeight; ++i) {
         for (auto &c: colors) {
             for (int j = 0; j < graphicsSettings::cellWidth; ++j) {
-                colorVec.push_back(c.second.r);
-                colorVec.push_back(c.second.g);
-                colorVec.push_back(c.second.b);
-                colorVec.push_back(c.second.a);
+                pixels[pos] = c.second.r;
+                pixels[pos + 1] = c.second.g;
+                pixels[pos + 2] = c.second.b;
+                pixels[pos + 3] = c.second.a;
+                pos += 4;
             }
             if (i == 0) {
                 result.push_back(c);
             }
         }
     }
-    texture.create(colorVec.size() * graphicsSettings::cellWidth, graphicsSettings::cellHeight);
-    texture.update(&colorVec[0]);
+    texture.create(result.size() * graphicsSettings::cellWidth, graphicsSettings::cellHeight);
+    texture.update(pixels);
 }

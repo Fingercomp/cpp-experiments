@@ -15,6 +15,7 @@ Board::Board(const int w, const int h): _w(w), _h(h) {
 
 std::vector<bool> Board::newGeneration() {
     std::vector<bool> newGen;
+    fill(newGen, _w * _h);
     for (int y = 0; y < _h; ++y) {
         for (int x = 0; x < _w; ++x) {
             bool cell = _cells[y * _w + x];
@@ -45,18 +46,20 @@ int Board::getNeighborCount(const int x, const int y) const {
     int neighbors = 0;
     for (int i = x - 1; i <= x + 1; ++i) {
         // "glue" the edges of a board
+        int indexI = i;
         if (i < 0) {
-            i = _w + i;
+            indexI = _w + i;
         } else if (i >= _w) {
-            i = i % _w;
+            indexI = i % _w;
         }
         for (int j = y - 1; j <= y + 1; ++j) {
+            int indexJ = j;
             if (j < 0) {
-                j = _h + j;
+                indexJ = _h + j;
             } else if (j >= _h) {
-                j = j % _h;
+                indexJ = j % _h;
             }
-            if (_cells[j * _w + i]) {
+            if (_cells[indexJ * _w + indexI]) {
                 ++i;
             }
         }
@@ -90,7 +93,7 @@ void Board::resize(const int w, const int h) {
     assert(h > 1);
 
     std::vector<bool> newBoard;
-    newBoard.reserve(w * h);
+    fill(newBoard, w * h);
     for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
             bool cell;
@@ -105,4 +108,5 @@ void Board::resize(const int w, const int h) {
     _cells = newBoard;
     _w = w;
     _h = h;
+    _nextGen = newGeneration();
 }

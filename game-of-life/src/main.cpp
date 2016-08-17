@@ -15,7 +15,7 @@ int main() {
     CellTilemap cellTilemap(board);
     sf::Texture texture;
     std::vector<std::pair<Tile, sf::Color>> tilesetNumbers;
-    std::vector<uint8_t> tilesetBytes;
+    sf::Uint8 *tilesetBytes = nullptr;
     createTileset(graphicsSettings::colors, tilesetNumbers, tilesetBytes, texture);
     Tilemap tilemap(cellTilemap, texture, tilesetNumbers);
     sf::RenderWindow window(sf::VideoMode(800, 600), "Game of Life");
@@ -36,6 +36,15 @@ int main() {
                     window.setView(sf::View(visibleArea));
                     cellTilemap.resize(ceil(static_cast<float>(event.size.width) / graphicsSettings::cellWidth), ceil(static_cast<float>(event.size.height) / graphicsSettings::cellHeight));
                 }
+                case sf::Event::MouseButtonPressed: {
+                    if (event.mouseButton.button == sf::Mouse::Left) {
+                        int x = event.mouseButton.x;
+                        int y = event.mouseButton.y;
+                        x = x / graphicsSettings::cellWidth;
+                        y = y / graphicsSettings::cellHeight;
+                        cellTilemap.set(x, y, true);
+                    }
+                }
                 default:
                     break;
             }
@@ -43,7 +52,10 @@ int main() {
         window.clear();
         tilemap.update();
         window.draw(tilemap);
+        // window.draw(shape, &texture);
         window.display();
     }
+
+    delete[] tilesetBytes;
     return 0;
 }
