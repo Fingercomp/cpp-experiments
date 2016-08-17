@@ -39,7 +39,11 @@ void CellTilemap::update() {
             } else if (!thisGenCell && nextGenCell) {
                 _tiles.at(index) = Tile::ALIVE_NEXT_GEN;
             } else if (!thisGenCell && !nextGenCell) {
-                _tiles.at(index) = Tile::DEAD;
+                if ((i + j) % 2) {
+                    _tiles.at(index) = Tile::DEAD;
+                } else {
+                    _tiles.at(index) = Tile::GRID;
+                }
             }
         }
     }

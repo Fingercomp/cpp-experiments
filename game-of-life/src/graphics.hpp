@@ -16,7 +16,8 @@ enum class Tile {
     DEAD,
     DEAD_NEXT_GEN,
     ALIVE,
-    ALIVE_NEXT_GEN
+    ALIVE_NEXT_GEN,
+    GRID
 };
 
 
@@ -27,7 +28,8 @@ namespace graphicsSettings {
         {Tile::DEAD, sf::Color(0x00, 0x00, 0x00)},
         {Tile::DEAD_NEXT_GEN, sf::Color(0xff, 0x40, 0x40)},
         {Tile::ALIVE, sf::Color(0xff, 0xff, 0xff)},
-        {Tile::ALIVE_NEXT_GEN, sf::Color(0x00, 0x40, 0x00)}
+        {Tile::ALIVE_NEXT_GEN, sf::Color(0x00, 0x40, 0x00)},
+        {Tile::GRID, sf::Color(0x20, 0x20, 0x20)}
     };
 }
 
