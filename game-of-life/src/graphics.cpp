@@ -9,6 +9,15 @@ Tilemap::Tilemap(Board &board): _board(board) {
 }
 
 void Tilemap::update() {
+    int newWidth = _board.getWidth();
+    int newHeight = _board.getHeight();
+    if (_w == newWidth && _h == newHeight) {
+        // The board was resized
+        _w = newWidth;
+        _h = newHeight;
+        _tiles.clear();
+        _tiles.reserve(newWidth * newHeight);
+    }
     const std::vector<bool> thisGen = _board.getCells();
     const std::vector<bool> nextGen = _board.getNextGeneration();
     for (int j = 0; j < _h; ++j) {
@@ -35,6 +44,11 @@ Tile Tilemap::get(const int x, const int y) const {
 
 void Tilemap::set(const int x, const int y, const bool value) {
     _board.set(x, y, value);
+    update();
+}
+
+void Tilemap::resize(const int x, const int y) {
+    _board.resize(x, y);
     update();
 }
 

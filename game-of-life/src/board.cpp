@@ -89,3 +89,25 @@ bool Board::get(const int x, const int y) const {
 
     return _cells[y * _w + x];
 }
+
+void Board::resize(const int w, const int h) {
+    assert(w > 1);
+    assert(h > 1);
+
+    std::vector<bool> newBoard;
+    newBoard.reserve(w * h);
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            bool cell;
+            if (x < _w && y < _h) {
+                cell = _cells[y * _w + x];
+            } else {
+                cell = false;
+            }
+            newBoard[y * w + x] = cell;
+        }
+    }
+    _cells = newBoard;
+    _w = w;
+    _h = h;
+}

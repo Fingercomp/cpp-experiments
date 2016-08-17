@@ -29,6 +29,7 @@ public:
     void update();
     Tile get(const int x, const int y) const;
     void set(const int x, const int y, const bool value);
+    void resize(const int x, const int y);
 };
 
 
