@@ -28,10 +28,6 @@ void CellTilemap::update() {
             int index = j * _w + i;
             bool thisGenCell = thisGen.at(index);
             bool nextGenCell = nextGen.at(index);
-            if (thisGenCell || nextGenCell) {
-                // nop.
-                int aaabbb = 0;
-            }
             if (thisGenCell && nextGenCell) {
                 _tiles.at(index) = Tile::ALIVE;
             } else if (thisGenCell && !nextGenCell) {

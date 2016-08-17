@@ -26,7 +26,7 @@ int main() {
     cellTilemap.resize(ceil(static_cast<float>(windowSize.x) / graphicsSettings::cellWidth), ceil(static_cast<float>(windowSize.y) / graphicsSettings::cellHeight));
 
     State state = State::PAUSED;
-    sf::Time updateInterval = sf::milliseconds(1000 / 5);  // in milliseconds
+    sf::Time updateInterval = sf::milliseconds(1000 / 5);
     sf::Clock clock;
 
     while (window.isOpen()) {
@@ -85,6 +85,22 @@ int main() {
                             break;
                     }
                     break;
+                }
+                case sf::Event::MouseMoved: {
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) ||
+                            sf::Mouse::isButtonPressed(sf::Mouse::Right) ||
+                            sf::Mouse::isButtonPressed(sf::Mouse::Middle)) {
+                        int x = event.mouseMove.x;
+                        int y = event.mouseMove.y;
+                        x /= graphicsSettings::cellWidth;
+                        y /= graphicsSettings::cellHeight;
+                        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                            cellTilemap.set(x, y, true);
+                        }
+                        if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+                            cellTilemap.set(x, y, false);
+                        }
+                    }
                 }
                 default:
                     break;
