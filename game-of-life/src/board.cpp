@@ -1,6 +1,7 @@
 #include <vector>
 
 #include "board.hpp"
+#include "utils.hpp"
 
 
 Board::Board(const int w, const int h): _w(w), _h(h) {
@@ -8,14 +9,8 @@ Board::Board(const int w, const int h): _w(w), _h(h) {
     assert(h > 1);
 
     // Fill the board
-    _cells.reserve(w * h);
-    _nextGen.reserve(w * h);
-    for (int j = 0; j < h; ++j) {
-        for (int i = 0; i < w; ++i) {
-            _cells[j * w + i] = false;
-            _nextGen[j * w + 1] = false;
-        }
-    }
+    fill(_cells, _w * _h);
+    fill(_nextGen, _w * _h);
 }
 
 std::vector<bool> Board::newGeneration() {

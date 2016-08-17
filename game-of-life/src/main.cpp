@@ -21,6 +21,9 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Game of Life");
     window.setVerticalSyncEnabled(true);
 
+    sf::Vector2u windowSize = window.getSize();
+    cellTilemap.resize(ceil(static_cast<float>(windowSize.x) / graphicsSettings::cellWidth), ceil(static_cast<float>(windowSize.y) / graphicsSettings::cellHeight));
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {

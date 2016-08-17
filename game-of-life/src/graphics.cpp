@@ -1,22 +1,23 @@
 #include "graphics.hpp"
+#include "utils.hpp"
 
 
 CellTilemap::CellTilemap(Board &board): _board(board) {
     _w = _board.getWidth();
     _h = _board.getHeight();
-    _tiles.reserve(_w * _h);
+    fill(_tiles, _w * _h);
     update();
 }
 
 void CellTilemap::update() {
     int newWidth = _board.getWidth();
     int newHeight = _board.getHeight();
-    if (_w == newWidth && _h == newHeight) {
+    if (_w != newWidth || _h != newHeight) {
         // The board was resized
         _w = newWidth;
         _h = newHeight;
         _tiles.clear();
-        _tiles.reserve(newWidth * newHeight);
+        fill(_tiles, _w * _h);
     }
     const std::vector<bool> thisGen = _board.getCells();
     const std::vector<bool> nextGen = _board.getNextGeneration();
@@ -26,13 +27,13 @@ void CellTilemap::update() {
             bool thisGenCell = thisGen[index];
             bool nextGenCell = nextGen[index];
             if (thisGenCell && nextGenCell) {
-                _tiles[index] = Tile::ALIVE;
+                _tiles.at(index) = Tile::ALIVE;
             } else if (thisGenCell && !nextGenCell) {
-                _tiles[index] = Tile::DEAD_NEXT_GEN;
+                _tiles.at(index) = Tile::DEAD_NEXT_GEN;
             } else if (!thisGenCell && nextGenCell) {
-                _tiles[index] = Tile::ALIVE_NEXT_GEN;
+                _tiles.at(index) = Tile::ALIVE_NEXT_GEN;
             } else if (!thisGenCell && !nextGenCell) {
-                _tiles[index] = Tile::DEAD;
+                _tiles.at(index) = Tile::DEAD;
             }
         }
     }
@@ -89,10 +90,10 @@ void Tilemap::update() {
             quad[2].position = sf::Vector2f((i + 1) * graphicsSettings::cellWidth, (j + 1) * graphicsSettings::cellHeight);
             quad[3].position = sf::Vector2f(i * graphicsSettings::cellWidth, (j + 1) * graphicsSettings::cellHeight);
 
-            quad[0].texCoords = sf::Vector2f(num, 1);
-            quad[1].texCoords = sf::Vector2f(num, 1);
-            quad[2].texCoords = sf::Vector2f(num, 1);
-            quad[3].texCoords = sf::Vector2f(num, 1);
+            quad[0].texCoords = sf::Vector2f(num, 0);
+            quad[1].texCoords = sf::Vector2f(num, 0);
+            quad[2].texCoords = sf::Vector2f(num, 0);
+            quad[3].texCoords = sf::Vector2f(num, 0);
         }
     }
 }
@@ -133,13 +134,19 @@ sf::Font loadFont(std::string filename) {
 
 // Creates a tileset
 void createTileset(const std::map<Tile, sf::Color> &colors, std::vector<std::pair<Tile, sf::Color>> &result, std::vector<uint8_t> &colorVec, sf::Texture &texture) {
-    for (auto &c: colors) {
-        colorVec.push_back(c.second.r);
-        colorVec.push_back(c.second.g);
-        colorVec.push_back(c.second.b);
-        colorVec.push_back(c.second.a);
-        result.push_back(c);
+    for (int i = 0; i < graphicsSettings::cellHeight; ++i) {
+        for (auto &c: colors) {
+            for (int j = 0; j < graphicsSettings::cellWidth; ++j) {
+                colorVec.push_back(c.second.r);
+                colorVec.push_back(c.second.g);
+                colorVec.push_back(c.second.b);
+                colorVec.push_back(c.second.a);
+            }
+            if (i == 0) {
+                result.push_back(c);
+            }
+        }
     }
-    texture.create(colorVec.size(), 1);
+    texture.create(colorVec.size() * graphicsSettings::cellWidth, graphicsSettings::cellHeight);
     texture.update(&colorVec[0]);
 }
